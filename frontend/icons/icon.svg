@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="80" fill="#0f1117"/>
+  <!-- Building outline -->
+  <rect x="136" y="180" width="240" height="240" rx="6" fill="none" stroke="#2563eb" stroke-width="18"/>
+  <!-- Roof / peak -->
+  <polyline points="110,195 256,90 402,195" fill="none" stroke="#2563eb" stroke-width="18" stroke-linejoin="round"/>
+  <!-- Door -->
+  <rect x="220" y="330" width="72" height="90" rx="4" fill="#2563eb"/>
+  <!-- Windows -->
+  <rect x="160" y="230" width="50" height="50" rx="4" fill="#2563eb" opacity="0.7"/>
+  <rect x="302" y="230" width="50" height="50" rx="4" fill="#2563eb" opacity="0.7"/>
+  <!-- AI spark -->
+  <circle cx="370" cy="142" r="42" fill="#0f1117"/>
+  <text x="370" y="157" text-anchor="middle" font-size="42" font-family="sans-serif" fill="#2563eb">AI</text>
+</svg>

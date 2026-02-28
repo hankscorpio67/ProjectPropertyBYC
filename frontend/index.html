@@ -2,8 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Property Strategy AI</title>
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- Android / Chrome -->
+  <meta name="theme-color" content="#0f1117" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <!-- iOS Safari (partial PWA support) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="PropertyAI" />
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png" />
+
   <link rel="stylesheet" href="/static/style.css" />
   <!-- Markdown rendering -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -200,5 +214,20 @@
 <script src="/static/js/api.js"></script>
 <script src="/static/js/voice.js"></script>
 <script src="/static/js/app.js"></script>
+
+<script>
+  // Register service worker for PWA install + offline support
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').catch(() => {});
+    });
+  }
+
+  // Auto-launch car mode when opened via the "Car Mode" shortcut
+  // (?car=1 is set in manifest.json shortcuts)
+  if (new URLSearchParams(location.search).get('car') === '1') {
+    window.addEventListener('load', () => setTimeout(toggleCarMode, 500));
+  }
+</script>
 </body>
 </html>

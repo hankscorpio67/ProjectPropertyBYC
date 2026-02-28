@@ -45,6 +45,24 @@ async def serve_frontend():
     return FileResponse(os.path.join(_frontend_dir, "index.html"))
 
 
+# PWA required files at root paths (browsers fetch these without /static/ prefix)
+@app.get("/sw.js")
+async def service_worker():
+    return FileResponse(
+        os.path.join(_frontend_dir, "sw.js"),
+        media_type="application/javascript",
+        headers={"Service-Worker-Allowed": "/"},
+    )
+
+
+@app.get("/manifest.json")
+async def manifest():
+    return FileResponse(
+        os.path.join(_frontend_dir, "manifest.json"),
+        media_type="application/manifest+json",
+    )
+
+
 @app.get("/{path:path}")
 async def catch_all(path: str):
     # Serve index.html for any non-API route (SPA support)
