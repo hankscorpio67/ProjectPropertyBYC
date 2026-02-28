@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>Property Strategy AI</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <!-- Markdown rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+
+<!-- ===== SIDEBAR ===== -->
+<aside id="sidebar">
+  <div class="sidebar-header">
+    <div class="app-logo">
+      <span class="logo-icon">🏗️</span>
+      <span class="logo-text">Property<br><strong>Strategy AI</strong></span>
+    </div>
+    <button id="btn-new-project" class="btn-primary btn-full" onclick="showNewProjectModal()">+ New Project</button>
+  </div>
+
+  <div class="sidebar-section-label">PROJECTS</div>
+  <ul id="project-list" class="project-list"></ul>
+
+  <div class="sidebar-footer">
+    <button class="btn-icon-text" onclick="showPanel('settings')" title="Settings">⚙ Settings</button>
+    <button class="btn-icon-text car-mode-btn" onclick="toggleCarMode()" title="Car mode">🚗 Car Mode</button>
+  </div>
+</aside>
+
+<!-- ===== MAIN CONTENT ===== -->
+<main id="main">
+
+  <!-- No project selected -->
+  <div id="panel-welcome" class="panel active">
+    <div class="welcome-content">
+      <div class="welcome-icon">🏗️</div>
+      <h1>Property Strategy AI</h1>
+      <p>Your strategic property development advisor.<br>Create a project to get started.</p>
+      <button class="btn-primary btn-large" onclick="showNewProjectModal()">Create Your First Project</button>
+    </div>
+  </div>
+
+  <!-- Chat panel -->
+  <div id="panel-chat" class="panel">
+    <div class="panel-header">
+      <div class="panel-header-left">
+        <h2 id="chat-project-name">Project</h2>
+        <span id="chat-project-desc" class="subtext"></span>
+      </div>
+      <div class="panel-header-right">
+        <button class="btn-tab active" onclick="switchTab('chat')" data-tab="chat">💬 Chat</button>
+        <button class="btn-tab" onclick="switchTab('documents')" data-tab="documents">📁 Documents</button>
+        <button class="btn-tab" onclick="switchTab('reports')" data-tab="reports">📊 Reports</button>
+        <button class="btn-icon" onclick="showProjectSettings()" title="Edit project">✏️</button>
+      </div>
+    </div>
+
+    <!-- Chat tab -->
+    <div id="tab-chat" class="tab-content active">
+      <div id="messages" class="messages-container"></div>
+      <div class="input-area">
+        <div class="input-toolbar">
+          <label class="toggle-label" title="Enable web search for current market data">
+            <input type="checkbox" id="search-toggle" checked />
+            <span>🔍 Web search</span>
+          </label>
+          <button class="btn-icon-sm" onclick="clearChatHistory()" title="Clear conversation">🗑 Clear</button>
+        </div>
+        <div class="input-row">
+          <textarea
+            id="chat-input"
+            placeholder="Ask about your project, brainstorm ideas, or request analysis..."
+            rows="1"
+            onkeydown="handleChatKeydown(event)"
+            oninput="autoResizeTextarea(this)"
+          ></textarea>
+          <button id="voice-btn" class="btn-voice" onclick="toggleVoiceInput()" title="Voice input">🎤</button>
+          <button id="send-btn" class="btn-send" onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Documents tab -->
+    <div id="tab-documents" class="tab-content">
+      <div class="upload-zone" id="upload-zone"
+           ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+        <div class="upload-icon">📎</div>
+        <p>Drag & drop files here, or</p>
+        <label class="btn-primary">
+          Browse Files
+          <input type="file" id="file-input" multiple accept=".pdf,.docx,.doc,.xlsx,.xls,.txt"
+                 onchange="handleFileSelect(event)" style="display:none" />
+        </label>
+        <p class="upload-hint">Supports PDF, Word, Excel, and text files (max 50MB)</p>
+      </div>
+      <div id="documents-list" class="documents-list"></div>
+    </div>
+
+    <!-- Reports tab -->
+    <div id="tab-reports" class="tab-content">
+      <div class="reports-generate">
+        <h3>Generate Report</h3>
+        <div class="report-types" id="report-types"></div>
+        <textarea id="report-instructions" placeholder="Additional instructions (optional)..." rows="2"></textarea>
+        <button class="btn-primary" onclick="generateReport()">Generate Report</button>
+      </div>
+      <div id="reports-list" class="reports-list"></div>
+    </div>
+  </div>
+
+  <!-- Settings panel -->
+  <div id="panel-settings" class="panel">
+    <div class="panel-header">
+      <h2>Settings</h2>
+      <button class="btn-back" onclick="goBack()">← Back</button>
+    </div>
+    <div class="settings-content">
+      <h3>Voice & Audio</h3>
+      <label class="setting-row">
+        <span>Auto-read responses aloud</span>
+        <input type="checkbox" id="setting-autoread" onchange="saveSetting('autoread', this.checked)" />
+      </label>
+      <label class="setting-row">
+        <span>TTS Voice</span>
+        <select id="setting-voice" onchange="saveSetting('voice', this.value)">
+          <option value="auto">Browser default</option>
+        </select>
+      </label>
+      <label class="setting-row">
+        <span>Use server TTS (higher quality)</span>
+        <input type="checkbox" id="setting-server-tts" onchange="saveSetting('serverTts', this.checked)" />
+      </label>
+
+      <h3>Display</h3>
+      <label class="setting-row">
+        <span>Dark mode</span>
+        <input type="checkbox" id="setting-dark" onchange="saveSetting('darkMode', this.checked)" />
+      </label>
+
+      <h3>About</h3>
+      <p class="subtext">Property Strategy AI — Built with Claude claude-sonnet-4-6</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- ===== CAR MODE OVERLAY ===== -->
+<div id="car-mode" class="car-mode-overlay hidden">
+  <div class="car-header">
+    <span id="car-project-name">No project selected</span>
+    <button class="car-close" onclick="toggleCarMode()">✕ Exit Car Mode</button>
+  </div>
+  <div id="car-messages" class="car-messages"></div>
+  <div class="car-status" id="car-status">Tap mic to speak</div>
+  <div class="car-controls">
+    <button id="car-mic-btn" class="car-mic" onclick="toggleVoiceInput(true)">🎤</button>
+  </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<div id="modal-overlay" class="modal-overlay hidden" onclick="closeModal(event)">
+  <div class="modal" id="modal-new-project">
+    <h2>New Project</h2>
+    <label>Project Name *
+      <input type="text" id="new-project-name" placeholder="e.g. 123 Smith St Residential Development" />
+    </label>
+    <label>Description
+      <textarea id="new-project-desc" placeholder="Brief description of the project, location, and key objectives..."
+        rows="3"></textarea>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="createProject()">Create Project</button>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-edit-project" style="display:none">
+    <h2>Edit Project</h2>
+    <label>Project Name
+      <input type="text" id="edit-project-name" />
+    </label>
+    <label>Description
+      <textarea id="edit-project-desc" rows="3"></textarea>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-danger" onclick="deleteCurrentProject()">Delete Project</button>
+      <div>
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveProjectEdit()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/voice.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
